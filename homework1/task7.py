@@ -10,7 +10,7 @@ def timing(f):
         start_time = time.time()
         result = f(*args, **kwargs)
         end_time = time.time()
-        print(f"Function {f.__name__} took {end_time - start_time} for execution")
+        print(f"Function {f.__name__} took {end_time - start_time} secs")
         return result
 
     return wrapper
