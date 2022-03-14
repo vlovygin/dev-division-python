@@ -4,7 +4,12 @@ import string
 import pytest
 
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+
+
+def find(by, what):
+    return lambda d: d.find_element(by, what)
 
 
 @pytest.mark.UI
@@ -16,29 +21,30 @@ class TestUserPage:
 
         wait = WebDriverWait(driver, 15)
 
-        wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "div[class*=rightSide] > div[class^=responseHead-module-button]"))
+        wait.until(find(By.CSS_SELECTOR, "div[class*=rightSide] > div[class^=responseHead-module-button]"))
         driver.find_element(By.CSS_SELECTOR, "div[class*=rightSide] > div[class^=responseHead-module-button]").click()
 
-        wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "div[class*=authForm] > input[name=email]"))
+        wait.until(find(By.CSS_SELECTOR, "div[class*=authForm] > input[name=email]"))
         driver.find_element(By.CSS_SELECTOR, "div[class*=authForm] > input[name=email]").clear()
         driver.find_element(By.CSS_SELECTOR, "div[class*=authForm] > input[name=email]").send_keys(test_user.login)
 
-        wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "div[class*=rightSide] > div[class^=responseHead-module-button]"))
+        wait.until(find(By.CSS_SELECTOR, "div[class*=rightSide] > div[class^=responseHead-module-button]"))
         driver.find_element(By.CSS_SELECTOR, "div[class*=authForm] > input[name=password]").clear()
-        driver.find_element(By.CSS_SELECTOR, "div[class*=authForm] > input[name=password]").send_keys(test_user.password)
+        driver.find_element(By.CSS_SELECTOR,
+                            "div[class*=authForm] > input[name=password]").send_keys(test_user.password)
 
-        wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "div[class^=authForm-module-actions] > div[class*=authForm-module-button]"))
-        driver.find_element(By.CSS_SELECTOR, "div[class^=authForm-module-actions] > div[class*=authForm-module-button]").click()
+        wait.until(find(By.CSS_SELECTOR, "div[class^=authForm-module-actions] > div[class*=authForm-module-button]"))
+        driver.find_element(By.CSS_SELECTOR,
+                            "div[class^=authForm-module-actions] > div[class*=authForm-module-button]").click()
 
-        wait.until_not(lambda d: d.find_element(By.CSS_SELECTOR, ".spinner"))
+        wait.until_not(find(By.CSS_SELECTOR, ".spinner"))
+        wait.until(find(By.CSS_SELECTOR, "div[class*=right-module-mail] > div[class^=right-module-userNameWrap]"))
 
     def test_login(self, driver):
         """User logged in to private office"""
 
-        wait = WebDriverWait(driver, 15)
-
-        wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "div[class*=right-module-mail] > div[class^=right-module-userNameWrap]"))
-        profile_name = driver.find_element(By.CSS_SELECTOR, "div[class*=right-module-mail] > div[class^=right-module-userNameWrap]").text
+        profile_name = driver.find_element(By.CSS_SELECTOR,
+                                           "div[class*=right-module-mail] > div[class^=right-module-userNameWrap]").text
 
         assert profile_name, "Profile name must be displayed at private office"
         assert driver.get_cookie('mc'), "'mc' cookie must be set for authenticated user"
@@ -48,14 +54,18 @@ class TestUserPage:
 
         wait = WebDriverWait(driver, 15)
 
-        wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "div[class*=right-module-mail]"))
+        wait.until(find(By.CSS_SELECTOR, "div[class*=right-module-mail]"))
         driver.find_element(By.CSS_SELECTOR, "div[class*=right-module-mail]").click()
 
-        wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "ul[class*=visibleRightMenu] a[href='/logout']").location["y"] > 60)
+        wait.until(lambda d: d.find_element(By.CSS_SELECTOR,
+                                            "ul[class*=visibleRightMenu] a[href='/logout']").location["y"] == 91)
+
+        wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "ul[class*=visibleRightMenu] a[href='/logout']")))
         driver.find_element(By.CSS_SELECTOR, "ul[class*=visibleRightMenu] a[href='/logout']").click()
 
-        wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "div[class*=rightSide] > div[class^=responseHead-module-button]"))
-        entry_btn_text = driver.find_element(By.CSS_SELECTOR, "div[class*=rightSide] > div[class^=responseHead-module-button]").text
+        wait.until(find(By.CSS_SELECTOR, "div[class*=rightSide] > div[class^=responseHead-module-button]"))
+        entry_btn_text = driver.find_element(By.CSS_SELECTOR,
+                                             "div[class*=rightSide] > div[class^=responseHead-module-button]").text
 
         assert entry_btn_text == "Войти", "Entry button must be displayed after logout"
         assert not driver.get_cookie('mc'), "'mc' cookie must be deleted for not authenticated user"
@@ -66,19 +76,19 @@ class TestUserPage:
         wait = WebDriverWait(driver, 15)
         new_full_name = "".join([random.choice(string.ascii_letters) for _ in range(10)])
 
-        wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "ul[class^=center-module-buttons] a[href='/profile']"))
+        wait.until(find(By.CSS_SELECTOR, "ul[class^=center-module-buttons] a[href='/profile']"))
         driver.find_element(By.CSS_SELECTOR, "ul[class^=center-module-buttons] a[href='/profile']").click()
 
-        wait.until(lambda d: d.find_element(By.CSS_SELECTOR, ".input[data-name=fio] input"))
+        wait.until(find(By.CSS_SELECTOR, ".input[data-name=fio] input"))
         driver.find_element(By.CSS_SELECTOR, ".input[data-name=fio] input").clear()
         driver.find_element(By.CSS_SELECTOR, ".input[data-name=fio] input").send_keys(new_full_name)
 
-        wait.until(lambda d: d.find_element(By.CSS_SELECTOR, "button.button_submit"))
+        wait.until(find(By.CSS_SELECTOR, "button.button_submit"))
         driver.find_element(By.CSS_SELECTOR, "button.button_submit").click()
 
         driver.refresh()
 
-        wait.until(lambda d: d.find_element(By.CSS_SELECTOR, ".input[data-name=fio] input"))
+        wait.until(find(By.CSS_SELECTOR, ".input[data-name=fio] input"))
         current_full_name = driver.find_element(By.CSS_SELECTOR, ".input[data-name=fio] input").get_attribute("value")
 
         assert current_full_name == new_full_name, "User full name not updated"
@@ -92,9 +102,10 @@ class TestUserPage:
 
         wait = WebDriverWait(driver, 15)
 
-        wait.until(lambda d: d.find_element(By.CSS_SELECTOR, f"ul[class^=center-module-buttons] a[href='{href}']"))
+        wait.until(find(By.CSS_SELECTOR, f"ul[class^=center-module-buttons] a[href='{href}']"))
         driver.find_element(By.CSS_SELECTOR, f"ul[class^=center-module-buttons] a[href='{href}']").click()
 
-        wait.until_not(lambda d: d.find_element(By.CSS_SELECTOR, ".spinner"))
+        wait.until_not(find(By.CSS_SELECTOR, ".spinner"))
 
-        assert driver.current_url == f"{base_url}{path}", f"Expected url is {base_url}{path}, but given {driver.current_url}"
+        assert driver.current_url == f"{base_url}{path}", \
+            f"Expected url is {base_url}{path}, but given {driver.current_url}"

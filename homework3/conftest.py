@@ -24,4 +24,4 @@ def driver(base_url) -> WebDriver:
     wd.get(base_url)
 
     yield wd
-    wd.close()
+    wd.quit()
