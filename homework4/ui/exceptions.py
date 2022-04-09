@@ -1,0 +1,2 @@
+class PageNotLoadError(AssertionError):
+    pass

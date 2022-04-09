@@ -6,6 +6,15 @@ name = "pypi"
 [packages]
 pytest = "*"
 selenium = "*"
+allure-pytest = "*"
+webdriver-manager = "*"
+furl = "*"
+pytest-xdist = "*"
+python-dotenv = "*"
+pytest-repeat = "*"
+faker = "*"
+pytest-faker = "*"
+requests = "*"
 
 [dev-packages]
 
