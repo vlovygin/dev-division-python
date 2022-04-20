@@ -8,13 +8,13 @@ pytest = "*"
 selenium = "*"
 allure-pytest = "*"
 webdriver-manager = "*"
-furl = "*"
 pytest-xdist = "*"
 python-dotenv = "*"
 pytest-repeat = "*"
 faker = "*"
-pytest-faker = "*"
 requests = "*"
+requests-toolbelt = "*"
+pillow = "*"
 
 [dev-packages]
 
