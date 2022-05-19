@@ -1,0 +1,10 @@
+{
+    "base_url": "https://target.my.com",
+    "login_url": "https://account.my.com/",
+    "auth_url": "https://auth-ac.my.com",
+    "selenoid": {
+        "host": "10.10.1.117",
+        "port": "4444",
+        "session_timeout": "5m"
+    }
+}
