@@ -15,6 +15,9 @@ faker = "*"
 requests = "*"
 requests-toolbelt = "*"
 pillow = "*"
+sqlalchemy = "*"
+pymysql = "*"
+pytz = "*"
 
 [dev-packages]
 
