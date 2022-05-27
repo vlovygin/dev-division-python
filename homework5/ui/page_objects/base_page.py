@@ -19,7 +19,8 @@ class BasePage:
         self.base_url: str = app_config["base_url"]
         self.logger: logging.Logger = logging.getLogger('test')
 
-        if load: self.load()
+        if load:
+            self.load()
 
     @property
     def current_url(self):

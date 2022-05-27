@@ -18,6 +18,7 @@ pillow = "*"
 sqlalchemy = "*"
 pymysql = "*"
 pytz = "*"
+pycodestyle = "*"
 
 [dev-packages]
 

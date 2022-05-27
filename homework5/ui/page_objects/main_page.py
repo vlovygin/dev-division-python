@@ -12,7 +12,6 @@ class MainPageLocators:
     SUBMIT_LOGIN_BTN_DISABLED = (By.CSS_SELECTOR, "div[class^=authForm] > div[class*=button][class*=disabled]")
 
 
-
 class MainPage(BasePage):
     locators = MainPageLocators()
 
