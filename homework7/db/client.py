@@ -63,12 +63,11 @@ class MysqlORMClient:
             r"(?P<body_bytes_sent>.*) "
             r"(\"(?P<http_referer>.*)\") "
             r"(\"(?P<http_user_agent>.*)\") "
-            r"(\"(?P<gzip_ratio>.*)\")"
-            , re.IGNORECASE)
+            r"(\"(?P<gzip_ratio>.*)\")", re.IGNORECASE)
 
         with open(log_path, "r") as f:
-            for l in f.readlines():
-                r = re.search(log_pattern, l)
+            for line in f.readlines():
+                r = re.search(log_pattern, line)
                 log_dict: dict = r.groupdict()
 
                 log_dict["time_local"] = datetime.strptime(log_dict["time_local"], '%d/%b/%Y:%H:%M:%S %z').astimezone(

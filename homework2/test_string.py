@@ -33,7 +33,8 @@ class TestString:
         Check adding zeros (0) at the beginning of the string, until it reaches the specified length.
         """
         result = s.zfill(pad_width)
-        assert result == expected_result, f'Expected result of "{s}".zfill({pad_width}) is "{expected_result}", but given: "{result}")'
+        assert result == expected_result, \
+            f'Expected result of "{s}".zfill({pad_width}) is "{expected_result}", but given: "{result}")'
 
     def test_string_upper_method(self):
         """

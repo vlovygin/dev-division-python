@@ -16,7 +16,7 @@ class MainPage(BasePage):
     _login_input = Element(By.CSS_SELECTOR, "div[class*=authForm] > input[name=email]")
     _password_input = Element(By.CSS_SELECTOR, "div[class*=authForm] > input[name=password]")
     _submit_login_btn = Element(By.CSS_SELECTOR,
-                               "div[class^=authForm-module-actions] > div[class*=authForm-module-button]")
+                                "div[class^=authForm-module-actions] > div[class*=authForm-module-button]")
 
     @allure.step("Login by user")
     def login(self, user, password):
