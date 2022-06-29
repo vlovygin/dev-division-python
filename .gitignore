@@ -105,7 +105,6 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
 .venv
 env/
 venv/
@@ -141,3 +140,4 @@ cython_debug/
 .idea
 .temp
 allure-results
+/final/.env

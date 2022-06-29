@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pytest = "*"
+allure-pytest = "*"
+requests = "*"
+requests-toolbelt = "*"
+sqlalchemy = "*"
+python-dotenv = "*"
+pymysql = "*"
+faker = "*"
+pytest-xdist = "*"
+selenium = "*"
+webdriver-manager = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3"

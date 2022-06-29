@@ -1,0 +1,19 @@
+{
+  "base_url": "http://localhost:8080",
+  "mysql": {
+    "drivername": "mysql+pymysql",
+    "host": "localhost",
+    "port": 3306,
+    "username": "test_qa",
+    "password": "qa_test",
+    "database": "APP_DB",
+    "query": {
+      "autocommit": "true"
+    }
+  },
+  "selenoid": {
+    "host": "localhost",
+    "port": "4444"
+  },
+  "vk_mock": "http://localhost:5000"
+}

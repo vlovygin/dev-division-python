@@ -1,0 +1,93 @@
+networks:
+  default:
+    name: ${NETWORK_NAME:-selenoid}
+    external: true
+
+services:
+  db:
+    tty: true
+    image: "mysql"
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: test_qa
+      MYSQL_PASSWORD: qa_test
+      MYSQL_DATABASE: APP_DB
+    volumes:
+      - ./src/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: mysqladmin -uroot -proot ping -h db
+      interval: 5s
+      retries: 30
+
+  vk_mock:
+    tty: true
+    build: ./src/vk_mock
+    image: vk_mock
+    ports:
+      - "5000:5000"
+    command: python3 -m flask run --host=0.0.0.0 --port=5000
+    healthcheck:
+      test: netstat -ant | grep 5000 | grep -w LISTEN
+      interval: 5s
+      retries: 30
+
+  myapp:
+    tty: true
+    image: "myapp"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./src/app/app_config.conf:/app/app_config.conf
+    command: /app/myapp --config=/app/app_config.conf
+    depends_on:
+      db:
+        condition: service_healthy
+      vk_mock:
+        condition: service_healthy
+    healthcheck:
+      test: curl -f http://myapp:8080
+      interval: 5s
+      retries: 30
+
+  selenoid:
+    tty: true
+    image: aerokube/selenoid
+    volumes:
+      - "./src/selenoid:/etc/selenoid"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    command: [ "-conf", "/etc/selenoid/browsers.json",
+               "-video-output-dir", "/opt/selenoid/video",
+               "-log-output-dir", "/opt/selenoid/logs",
+               "-container-network", "${NETWORK_NAME:-selenoid}" ]
+    healthcheck:
+      test: netstat -ant | grep 4444 | grep -w LISTEN
+      interval: 5s
+      retries: 30
+
+  selenoid-ui:
+    image: aerokube/selenoid-ui
+    ports:
+      - "8081:8080"
+    command: --selenoid-uri http://selenoid:4444
+    depends_on:
+      selenoid:
+        condition: service_healthy
+
+  tests:
+    tty: true
+    build: .
+    image: tests
+    environment:
+      ENV: test
+    volumes:
+      - ./main:/main
+    #      - ./tmp:/tmp
+    command: pytest -m UI --selenoid -n auto
+    #    command: ["/main/run.sh", "ui", "-m", "debug", "--url=http://devdivision.io", "--selenoid"]
+    depends_on:
+      myapp:
+        condition: service_healthy
+      selenoid:
+        condition: service_healthy
