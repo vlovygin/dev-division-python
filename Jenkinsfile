@@ -12,7 +12,6 @@ pipeline {
         }
 
     environment {
-//         docker = "/usr/local/bin/"
         ENV='test'
         JENKINS_USER_ID=sh(script: "id -u jenkins", returnStdout: true).trim()
 
