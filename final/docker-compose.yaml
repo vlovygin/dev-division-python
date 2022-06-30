@@ -1,14 +1,14 @@
 networks:
   default:
-    name: ${NETWORK_NAME:-selenoid}
     external: true
+    name: ${NETWORK_NAME:-selenoid}
 
 services:
   db:
     tty: true
     image: "mysql"
     ports:
-      - "3306:3306"
+      - 3306
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_USER: test_qa
@@ -26,7 +26,7 @@ services:
     build: ./src/vk_mock
     image: vk_mock
     ports:
-      - "5000:5000"
+      - 5000
     command: python3 -m flask run --host=0.0.0.0 --port=5000
     healthcheck:
       test: netstat -ant | grep 5000 | grep -w LISTEN
@@ -37,7 +37,7 @@ services:
     tty: true
     image: "myapp"
     ports:
-      - "8080:8080"
+      - 8080
     volumes:
       - ./src/app/app_config.conf:/app/app_config.conf
     command: /app/myapp --config=/app/app_config.conf
@@ -60,20 +60,12 @@ services:
     command: [ "-conf", "/etc/selenoid/browsers.json",
                "-video-output-dir", "/opt/selenoid/video",
                "-log-output-dir", "/opt/selenoid/logs",
-               "-container-network", "${NETWORK_NAME:-selenoid}" ]
+               "-container-network", "${NETWORK_NAME:-selenoid}",
+               "-limit", "2"]
     healthcheck:
       test: netstat -ant | grep 4444 | grep -w LISTEN
       interval: 5s
       retries: 30
-
-  selenoid-ui:
-    image: aerokube/selenoid-ui
-    ports:
-      - "8081:8080"
-    command: --selenoid-uri http://selenoid:4444
-    depends_on:
-      selenoid:
-        condition: service_healthy
 
   tests:
     tty: true
@@ -82,10 +74,9 @@ services:
     environment:
       ENV: test
     volumes:
-      - ./main:/main
-    #      - ./tmp:/tmp
-    command: pytest -m UI --selenoid -n auto
-    #    command: ["/main/run.sh", "ui", "-m", "debug", "--url=http://devdivision.io", "--selenoid"]
+      - ./test_app:/main
+    user: ${JENKINS_USER_ID:-root}
+    command: ${RUN_CMD:?not set RUN_CMD environment}
     depends_on:
       myapp:
         condition: service_healthy

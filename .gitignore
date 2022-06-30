@@ -139,5 +139,6 @@ cython_debug/
 
 .idea
 .temp
-allure-results
 /final/.env
+.tmp
+allure-results
