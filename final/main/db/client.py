@@ -7,8 +7,8 @@ from sqlalchemy.orm import sessionmaker
 from main.db.models import TestUsers
 from main.models.user import User
 
-
 logger = logging.getLogger("test")
+
 
 class DbClient:
     """ Database client """
@@ -46,4 +46,3 @@ class DbClient:
     def get_user(self, username):
         """ Get user from test_users """
         return self.session.query(TestUsers).filter(TestUsers.username == username).one_or_none()
-

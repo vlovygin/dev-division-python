@@ -88,4 +88,3 @@ class BasePage:
 
     def wait_miss(self, locator: tuple, timeout=None):
         self.wait(timeout).until_not(EC.presence_of_element_located(locator))
-
