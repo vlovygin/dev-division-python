@@ -196,6 +196,7 @@ class TestMainPageUserInfo(BaseTestUi):
 
 
 class TestMainPageNavigation(BaseTestUi):
+    authorized = True
 
     def test_navigate_by_brand(self):
         """
