@@ -14,7 +14,6 @@ pipeline {
     environment {
         ENV='test'
         JENKINS_USER_ID=sh(script: "id -u jenkins", returnStdout: true).trim()
-
     }
 
     stages {
@@ -55,7 +54,6 @@ pipeline {
                 sh 'docker compose -f final/docker-compose.yaml up --abort-on-container-exit'
             }
 
-
             post {
               always {
                     sh 'docker network rm $NETWORK_NAME'
@@ -73,6 +71,7 @@ pipeline {
                 results: [[path: 'final/test_app/allure-results']]
             ])
             cleanWs()
+            archiveArtifacts artifacts: 'final/test_app/.tmp/', allowEmptyArchive: true
         }
     }
 }
