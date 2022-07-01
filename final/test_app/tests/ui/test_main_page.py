@@ -1,3 +1,5 @@
+import time
+
 import pytest
 
 from tests.base import BaseTestUi
@@ -7,38 +9,12 @@ from ui.pages.main_page import MainPage
 pytestmark = pytest.mark.UI
 
 
-class TestMainPageNotAuthorized(BaseTestUi):
-    authorized = False
-
-    def test_open_main_page_not_authorized(self):
-        """
-        Открыть главную страницу без авторизации
-
-        Шаги:
-        1. Перейти на главную страницу
-
-        Ожидаемый результат:
-        1. Выполнился переход на страницу авторизации
-        2. На странице отобразилось сообщение "This page is available only to authorized users"
-        """
-
-        hint = "This page is available only to authorized users"
-
-        self.get_page(MainPage)
-
-        login_page = self.get_page(LoginPage, load=False)
-        assert login_page.get_hint_text() == hint, f"{hint} not shown"
-
-
-class TestMainPageAuth(BaseTestUi):
+class TestMainPageBase(BaseTestUi):
     authorized = True
 
-    def test_open_main_page_not_authorized(self):
+    def test_success_open_main_page(self):
         """
-        Открыть главную страницу после авторизации
-
-        Предусловие:
-        1. Выполнить авторизацию под пользователем
+        Открыть главную страницу авторизованным пользователем
 
         Шаги:
         1. Перейти на главную страницу
@@ -64,17 +40,162 @@ class TestMainPageAuth(BaseTestUi):
 
         Ожидаемый результат:
         1. Отобразилась страница авторизации
+        2. В БД поле active = 0
+        """
+
+        main_page = self.get_page(MainPage)
+        login_page = main_page.logout()
+        assert login_page.is_page_loaded(), "Login page not loaded after logout"
+
+        db_user = self.db_client.get_user(username=self.user.username)
+        assert db_user.active == 0, "active set in DB for logged out user"
+
+    def test_python_fact(self):
+        """
+        Отображается случайный мотивационный факт о python
+
+        Шаги:
+        1. Перейти на главную страницу
+
+        Ожидаемый результат:
+        1. В нижней части страницы отображается случайный мотивационный факт о python
         """
 
         main_page = self.get_page(MainPage)
 
-        login_page = main_page.logout()
+        assert main_page.get_fact_text(), "Fact about python not shown"
 
-        assert login_page.is_page_loaded(), "Login page not loaded after logout"
+
+class TestMainPageNotAuthorized(BaseTestUi):
+    authorized = False
+
+    def test_open_main_page_not_authorized(self):
+        """
+        Открыть главную страницу не авторизованным пользователем
+
+        Шаги:
+        1. Перейти на главную страницу
+
+        Ожидаемый результат:
+        1. Выполнился переход на страницу авторизации
+        2. На странице отобразилось сообщение "This page is available only to authorized users"
+        """
+
+        hint = "This page is available only to authorized users"
+
+        self.get_page(MainPage)
+
+        login_page = self.get_page(LoginPage, load=False)
+        assert login_page.get_hint_text() == hint, f"{hint} not shown"
+
+
+class TestMainPageUserInfo(BaseTestUi):
+    authorized = False
+
+    def test_user_info(self):
+        """
+        Проверить информацию о пользователе
+
+        Предусловие:
+        1. Создать нового пользователя
+        2. Авторизоваться
+
+        Шаги:
+        1. Перейти на главную страницу
+
+        Ожидаемый результат:
+        1. В разделе Logged as отображается username
+        2. В разделе User отображается информация о name, surname и middle_name
+        """
+
+        user = self.create_user(name="test_name",
+                                surname="test_surname",
+                                middle_name="test_middle_name")
+
+        login_page = self.get_page(LoginPage)
+        main_page = login_page.login(user.username, user.password)
+
+        assert main_page.get_logged_as_info() == user.username, "username not shown"
+        assert main_page.get_user_info() == " ".join([user.name, user.surname, user.middle_name]), \
+            "User info not correct"
+
+    def test_user_info_no_middle_name(self):
+        """
+        Проверить информацию о пользователе без отчества
+
+        Предусловие:
+        1. Создать нового пользователя без отчества
+        2. Авторизоваться
+
+        Шаги:
+        1. Перейти на главную страницу
+
+        Ожидаемый результат:
+        1. В разделе Logged as отображается username
+        2. В разделе User отображается информация о name, surname и middle_name
+        """
+
+        user = self.create_user(name="test_name",
+                                surname="test_surname",
+                                middle_name=None)
+
+        login_page = self.get_page(LoginPage)
+        main_page = login_page.login(user.username, user.password)
+
+        assert main_page.get_logged_as_info() == user.username, "username not shown"
+        assert main_page.get_user_info() == " ".join([user.name, user.surname, user.middle_name]), \
+            "User info not correct"
+
+    def test_user_vk_info(self):
+        """
+        Проверить информацию о VK id пользователя
+
+        Предусловие:
+        1. Создать нового пользователя
+        2. Сделать мок VK id для пользователя
+        3. Авторизоваться
+
+        Шаги:
+        1. Перейти на главную страницу
+
+        Ожидаемый результат:
+        1. В разделе VK ID отображается информация о VK id пользователя
+        """
+
+        vk_id = str(self.data_manager.randint())
+
+        user = self.create_user()
+        self.vk_mock_client.add_user(username=user.username, vk_id=vk_id)
+
+        login_page = self.get_page(LoginPage)
+        main_page = login_page.login(user.username, user.password)
+
+        assert main_page.get_vk_id() == vk_id, f"VK ID not is {vk_id}"
+
+    def test_user_no_vk_info(self):
+        """
+        Проверить информацию об отсутствии VK id пользователя
+
+        Предусловие:
+        1. Создать нового пользователя
+        2. Авторизоваться
+
+        Шаги:
+        1. Перейти на главную страницу
+
+        Ожидаемый результат:
+        1. Не отображается раздел с VK id
+        """
+
+        user = self.create_user()
+
+        login_page = self.get_page(LoginPage)
+        main_page = login_page.login(user.username, user.password)
+
+        assert not main_page.is_vk_id_info_visible(), f"Vk id field visible for user with no VK id"
 
 
 class TestMainPageNavigation(BaseTestUi):
-    authorized = True
 
     def test_navigate_by_brand(self):
         """
@@ -335,76 +456,3 @@ class TestMainPageNavigation(BaseTestUi):
         page = main_page.navigate_to_smtp()
 
         assert page.current_url == url, f"Page {url} not loaded"
-
-
-class TestMainPageInfo(BaseTestUi):
-
-    def test_user_info(self):
-        """
-        Проверить информацию о пользователе
-
-        Предусловие:
-        1. Создать нового пользователя
-        2. Авторизоваться
-
-        Шаги:
-        1. Перейти на главную страницу
-
-        Ожидаемый результат:
-        1. В разделе Logged as отображается username
-        2. В разделе User отображается информация о name, surname и middle_name
-        """
-
-        user = self.create_user()
-
-        login_page = self.get_page(LoginPage)
-        main_page = login_page.login(user.username, user.password)
-
-        assert main_page.get_logged_as_info() == user.username, "username not shown"
-        assert main_page.get_user_info() == " ".join([user.name, user.surname, user.middle_name]), "User info not shown"
-
-    def test_user_vk_info(self):
-        """
-        Проверить информацию о VK id пользователя
-
-        Предусловие:
-        1. Создать нового пользователя
-        2. Авторизоваться
-        3. Сделать мок VK id для пользователя
-
-        Шаги:
-        1. Перейти на главную страницу
-
-        Ожидаемый результат:
-        1. В разделе Logged as отображается username
-        2. В разделе User отображается информация о name, surname и middle_name
-        """
-
-        vk_id = str(self.data_manager.randint())
-
-        user = self.create_user()
-        self.vk_mock_client.add_user(username=user.username, vk_id=vk_id)
-
-        login_page = self.get_page(LoginPage)
-        main_page = login_page.login(user.username, user.password)
-
-        assert main_page.get_vk_id() == vk_id, f"VK ID not is {vk_id}"
-
-
-class TestMainPageFactInfo(BaseTestUi):
-    authorized = True
-
-    def test_python_fact(self):
-        """
-        Отображается случайный мотивационный факт о python
-
-        Шаги:
-        1. Перейти на главную страницу
-
-        Ожидаемый результат:
-        1. В нижней части страницы отображается случайный мотивационный факт о python
-        """
-
-        main_page = self.get_page(MainPage)
-
-        assert main_page.get_fact_text(), "Fact about python not shown"

@@ -169,3 +169,11 @@ class MainPage(BasePage):
     def get_vk_id(self):
         text = self.find(self.locators.VK_ID).text
         return text.removeprefix("VK ID: ")
+
+    @allure.step
+    def is_vk_id_info_visible(self):
+        try:
+            self.find(self.locators.VK_ID, timeout=2)
+            return True
+        except TimeoutException:
+            return False

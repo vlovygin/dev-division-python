@@ -21,6 +21,8 @@ class TestReg(BaseTestUi):
         Ожидаемый результат:
         1. Открылась главная страница
         2. Пользователь добавлен в БД
+        3. В БД поле access = 1
+        4. В БД проставили заполненные данные
         """
 
         user = self.data_manager.user()
@@ -39,6 +41,12 @@ class TestReg(BaseTestUi):
         assert main_page.is_page_loaded(), "Main page not shown after registration"
         db_user = self.db_client.get_user(username=user.username)
         assert db_user, "User not added to DB"
+        assert db_user.access == 1, "access not set in DB for logged in user"
+        assert db_user.name == user.name, "name is not valid for user in DB"
+        assert db_user.surname == user.surname, "surname is not valid for user in DB"
+        assert db_user.middle_name == user.middle_name, "middle_name is not valid for user in DB"
+        assert db_user.email == user.email, "email is not valid for user in DB"
+        assert db_user.password == user.password, "password is not valid for user in DB"
 
     def test_register_user_with_exists_username(self):
         """
@@ -152,7 +160,7 @@ class TestReg(BaseTestUi):
         4. Нажать Register
 
         Ожидаемый результат:
-        1. На странице отобразилось сообщение об ошибке
+        1. На странице отобразилось сообщение "Invalid email address"
         """
 
         hint = "Invalid email address"
@@ -232,4 +240,4 @@ class TestReg(BaseTestUi):
         reg_page = self.get_page(RegPage)
         login_page = reg_page.navigate_to_login()
 
-        assert login_page.is_page_loaded()
+        assert login_page.is_page_loaded(), "Login page not loaded"

@@ -25,7 +25,7 @@ class DataManager:
 
         return f"{self.uuid()}@{fake.domain_name()}"
 
-    def user(self, name=None, surname=None, middle_name=None, username=None, password=None, email=None, access=None,
+    def user(self, name=None, surname=None, middle_name=None, username=None, password=None, email=None, access=1,
              active=None, start_active_time=None):
         user = User(
             name=name or fake.first_name(),

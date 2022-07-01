@@ -1,3 +1,5 @@
+import time
+
 import pytest
 
 from tests.base import BaseTestUi
@@ -8,7 +10,7 @@ pytestmark = pytest.mark.UI
 
 class TestAuth(BaseTestUi):
 
-    def test_login(self):
+    def test_success_login(self):
         """
         Авторизоваться под пользователем
 
@@ -23,6 +25,8 @@ class TestAuth(BaseTestUi):
 
         Ожидаемый результат:
         1. Открылась главная страница
+        2. В БД поле active = 1
+        3. В БД поле start_active_time не пустое
         """
 
         user = self.create_user()
@@ -31,12 +35,15 @@ class TestAuth(BaseTestUi):
         main_page = login_page.login(username=user.username, password=user.password)
 
         assert main_page.is_page_loaded(), "MainPage page not opened"
+        db_user = self.db_client.get_user(username=user.username)
+        assert db_user.active == 1, "active not set in DB for logged in user"
+        assert db_user.start_active_time is not None, "start_active_time not set in DB for logged in user"
 
     def test_login_block_user(self):
         """
         Авторизоваться под заблокированным пользователем
 
-        Предусловия?
+        Предусловия:
         1. Создать нового пользователя с access = 0
 
         Шаги:
@@ -76,12 +83,15 @@ class TestAuth(BaseTestUi):
         assert login_page.get_username_attribute("maxlength") == "16", "Username maxlength not 16"
 
         assert login_page.get_password_attribute("required") == "true", "Password not required field"
-        assert login_page.get_password_attribute("minlength") == "6", "Password minlength not 1"
+        assert login_page.get_password_attribute("minlength") == "1", "Password minlength not 1"
         assert login_page.get_password_attribute("maxlength") == "255", "Password maxlength not 255"
 
     def test_login_with_incorrect_password(self):
         """
         Авторизоваться с указанием некорректного пароля
+
+        Предусловия:
+        1. Создать нового пользователя
 
         Шаги:
         1. Перейти на страницу логина
@@ -129,7 +139,7 @@ class TestAuth(BaseTestUi):
 
     def test_navigate_to_reg_page(self):
         """
-        Перейти на страницу навигации
+        Перейти на страницу регистрации
 
         Шаги:
         1. Перейти на страницу логина
@@ -142,4 +152,4 @@ class TestAuth(BaseTestUi):
         login_page = self.get_page(LoginPage)
         reg_page = login_page.navigate_to_reg_page()
 
-        assert reg_page.is_page_loaded()
+        assert reg_page.is_page_loaded(), "Registration page not loaded"

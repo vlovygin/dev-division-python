@@ -9,7 +9,6 @@ from db.client import DbClient
 from models.user import User
 from ui.pages.base_page import BasePage
 from ui.pages.login_page import LoginPage
-from ui.pages.main_page import MainPage
 from utils.data_manager import DataManager
 
 T = typing.TypeVar('T', bound=BasePage)
@@ -50,7 +49,12 @@ class BaseTestUi(BaseTest):
             self.logger.info("Prepare authenticated page object")
             LoginPage(self.driver, load=True)
 
-            cookies = self.api_client.session.cookies
+            # new user for each login
+            self.user = self.create_user()
+            client = self.api_not_auth_client
+            client.login(self.user.username, self.user.password).raise_for_status()
+
+            cookies = client.session.cookies
             for cookie in cookies:
                 cookie_dict = {
                     "name": cookie.name,
