@@ -35,6 +35,7 @@ pipeline {
 
             post {
               always {
+                    archiveArtifacts artifacts: 'final/test_app/.tmp/', allowEmptyArchive: true
                     sh 'docker network rm $NETWORK_NAME'
                     sh 'docker compose -f final/docker-compose.yaml down || true'
                 }
@@ -56,6 +57,7 @@ pipeline {
 
             post {
               always {
+                    archiveArtifacts artifacts: 'final/test_app/.tmp/', allowEmptyArchive: true
                     sh 'docker network rm $NETWORK_NAME'
                     sh 'docker compose -f final/docker-compose.yaml down || true'
                 }
@@ -70,7 +72,6 @@ pipeline {
                 reportBuildPolicy: 'ALWAYS',
                 results: [[path: 'final/test_app/allure-results']]
             ])
-            archiveArtifacts artifacts: 'final/test_app/.tmp/', allowEmptyArchive: true
             cleanWs()
         }
     }
