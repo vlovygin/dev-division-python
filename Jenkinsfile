@@ -70,8 +70,8 @@ pipeline {
                 reportBuildPolicy: 'ALWAYS',
                 results: [[path: 'final/test_app/allure-results']]
             ])
-            cleanWs()
             archiveArtifacts artifacts: 'final/test_app/.tmp/', allowEmptyArchive: true
+            cleanWs()
         }
     }
 }
