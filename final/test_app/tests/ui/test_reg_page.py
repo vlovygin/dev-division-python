@@ -48,6 +48,18 @@ class TestReg(BaseTestUi):
         assert db_user.email == user.email, "email is not valid for user in DB"
         assert db_user.password == user.password, "password is not valid for user in DB"
 
+    def test_reg_page_console_error(self):
+        """
+        Открыть страницу регистрации
+
+        Ожидаемый результат:
+        1. Проверить консоль на наличие ошибок
+        """
+
+        reg_page = self.get_page(RegPage)
+
+        assert not reg_page.get_console_error(), "Console has SEVERE message error"
+
     def test_register_user_with_exists_username(self):
         """
         Зарегистрировать нового пользователя с существующим username

@@ -1,5 +1,3 @@
-import time
-
 import pytest
 
 from tests.base import BaseTestUi
@@ -38,6 +36,18 @@ class TestAuth(BaseTestUi):
         db_user = self.db_client.get_user(username=user.username)
         assert db_user.active == 1, "active not set in DB for logged in user"
         assert db_user.start_active_time is not None, "start_active_time not set in DB for logged in user"
+
+    def test_login_page_console_error(self):
+        """
+        Открыть страницу логина
+
+        Ожидаемый результат:
+        1. Проверить консоль на наличие ошибок
+        """
+
+        login_page = self.get_page(LoginPage)
+
+        assert not login_page.get_console_error(), "Console has SEVERE message error"
 
     def test_login_block_user(self):
         """

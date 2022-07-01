@@ -27,6 +27,18 @@ class TestMainPageBase(BaseTestUi):
 
         assert main_page.is_page_loaded(), "Main page not loaded"
 
+    def test_main_page_console_error(self):
+        """
+        Открыть главную страницу
+
+        Ожидаемый результат:
+        1. Проверить консоль на наличие ошибок
+        """
+
+        main_page = self.get_page(MainPage)
+
+        assert not main_page.get_console_error(), "Console has SEVERE message error"
+
     def test_logout(self):
         """
         Выполнить выход из личного кабинета
