@@ -1,0 +1,8 @@
+AnsiColour
+workspace cleanup
+timestamper
+build timeout
+rebuilder
+parametrise-trigger
+copy-artifacts
+PostBuildScript

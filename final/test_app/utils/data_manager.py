@@ -9,6 +9,9 @@ fake = faker.Faker('ru_RU')
 
 class DataManager:
 
+    def __init__(self, path):
+        self.path = 123
+
     @staticmethod
     def uuid():
         """ Generate a random UUID """

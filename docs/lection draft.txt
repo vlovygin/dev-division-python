@@ -1,0 +1,142 @@
+https://learngitbranching.js.org/?locale=ru_RU
+
+git log --oneline
+
+# Слить текущий коммит с предыдущим
+git commit --amend
+
+
+# Откатиться на удаленный репозиторий, без сохранений коммитов:
+git reset --hard origin  # hard - удалит, soft - отменит коммиты с сохранением файлов из коммитов
+
+
+# Откатиться на определенный коммит
+1) 	git checkout <hash>
+	git push --force origin HEAD:main # запушить в origin состояние HEAD:main
+
+2)	git rebase -i <hash>
+
+
+
+# Новая ветка
+1) Обновиться до актуальной ветки
+    git checkout main
+    git pull
+2) Создаем новую ветку
+    git checkout -b <branch-name>
+    # делаем изменения
+    # коммитим
+3) Пушим в удаленный репозиторий новую ветку
+    git push -u origin <remote-branch-name> ?
+
+
+# Слияние
+    git merge <какую ветку сливаем>
+
+
+git branch -a # все ветки
+git branch -d <branch-name> # удалить ветку
+git push -d origin <branch-name> # удалить удаленную ветку
+
+
+
+git revert?
+
+
+# В случае мердж конфликта, наш коммит становится над изменениями последнего коммита origin/main.
+# Перед ребейсом сделать git fetch.
+# Можно сначала сделать git merge и решить конфликт, а потом залить.
+git rebase origin/main
+# потом решаем конфликт, например с помощью PyCharm через выпадающее меню в Git..
+# и продолжаем rebase
+git rebase --continue
+git push --force
+
+
+
+
+1) Обновиться до актуальной ветки
+    git checkout main
+    git pull
+2) Создаем новую ветку
+    git checkout -b <branch-name>
+    # делаем изменения
+    # коммитим
+3) Пушим в удаленный репозиторий новую ветку
+    git push -u origin <remote-branch-name> ?
+4) После мержа делаем ???
+    git branch -d <branch-name> # удалить ветку
+    git push -d origin <branch-name> # удалить удаленную ветку
+
+git fetch -p
+
+
+pipenv lock -r > requirements.txt
+
+
+
+docker rm -f $(docker ps -a -q)
+https://stackoverflow.com/questions/29145370/how-can-i-initialize-a-mysql-database-with-schema-in-a-docker-container
+
+
+
+
+Вопросы:
+
+1. Хелзчек через скрипт sh с выводом в лог
+2. docker-entrypoint-initdb.d/init.sql:ro - что такое /docker-entrypoint-initdb.d
+3. Как лучше создавать пользователя в БД?
+    --DROP DATABASE IF EXISTS APP_DB;
+    --CREATE DATABASE APP_DB;
+    --
+    --CREATE USER 'test_qa'@'%' IDENTIFIED BY 'qa_test';
+    --GRANT ALL PRIVILEGES ON APP_DB.test_users TO 'test_qa'@'%';
+    --FLUSH PRIVILEGES;
+
+4. selenoid/chrome:latest скачивать сборки до запуска контейнера. Отдельным шагом делать?
+
+5. selenoid - "/var/run/docker.sock:/var/run/docker.sock" Зачем и как это работает на винде?
+
+
+6. docker compose links vs depends on?
+
+
+7. selenoid/chrome:latest - куда вкрячить, и как быть для добавления сертификатов лучше? Пересборка билдов
+
+
+8. compose --build всегда? Что делать в случае изменений
+
+
+
+9. docker volume сжирает пространство. Что делать? docker volume rm $(docker volume ps -q)
+
+
+10. UI и API проекты в одном месте или лучше разносить
+
+
+
+11. Общая библиотека с общим кодом? Несколько приложений используют одну БД..
+https://gitlab.interfax.ru/help/user/packages/package_registry/index
+
+
+
+
+12. DataManager вызов из любого места. Сложности при параметризации.
+
+
+
+
+
+
+14. Общее логирование. Например конфигурация и т.п. До/После запуска тестов.
+
+
+
+
+15. Тесты в контейнере выполняются намного быстрее чем на машине.
+
+
+16. Как ускорить процесс pytest Collecting.. При большом количестве тестов с xdist выполняется очень долго.
+
+iostat -ktx 1
+

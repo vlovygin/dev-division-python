@@ -8,7 +8,7 @@ services:
     tty: true
     image: "mysql"
     ports:
-      - 3306
+      - 3306:3306
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_USER: test_qa
@@ -26,7 +26,7 @@ services:
     build: ./src/vk_mock
     image: vk_mock
     ports:
-      - 5000
+      - 5000:5000
     command: python3 -m flask run --host=0.0.0.0 --port=5000
     healthcheck:
       test: netstat -ant | grep 5000 | grep -w LISTEN
@@ -35,9 +35,9 @@ services:
 
   myapp:
     tty: true
-    image: registry.gitlab.com/dev-division/main-repo/myapp:latest
+    image: "myapp"
     ports:
-      - 8080
+      - 8080:8080
     volumes:
       - ./src/app/app_config.conf:/app/app_config.conf
     command: /app/myapp --config=/app/app_config.conf
@@ -66,20 +66,3 @@ services:
       test: netstat -ant | grep 4444 | grep -w LISTEN
       interval: 5s
       retries: 30
-
-  tests:
-    tty: true
-    build: .
-    image: tests
-    environment:
-      ENV: test
-    volumes:
-      - ./test_app:/main
-      - "/var/run/docker.sock:/var/run/docker.sock"
-    user: ${JENKINS_USER_ID:-root}
-    command: ${RUN_CMD:?not set RUN_CMD environment}
-    depends_on:
-      myapp:
-        condition: service_healthy
-      selenoid:
-        condition: service_healthy
